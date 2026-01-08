@@ -36,6 +36,7 @@
         <button type="button" onclick="clearText()">クリア</button>
     </form>
     <hr>
+    <hr>
     <form method="GET" action="/" style="margin-bottom:12px;">
         <input name="q" placeholder="用語で検索" value="{{ q or request.args.get('q','') }}">
         <input name="q_text" placeholder="説明で検索" value="{{ q_text or request.args.get('q_text','') }}">
