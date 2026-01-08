@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>IT用語掲示板</title>
+    <style>
+        .field { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .field label { margin-bottom: 6px; font-weight: bold; }
+        .btn {
+            display: inline-block;
+            padding: 6px 10px;
+            margin-right: 6px;
+            font-size: 14px;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn--edit { background: #1976d2; }
+        .btn--delete { background: #d32f2f; }
+    </style>
+</head>
+<body>
+    <h1>IT用語掲示板</h1>
+    <form method="POST">
+        <div class="field">
+            <label for="wordInput">用語:</label>
+            <input id="wordInput" name="word" type="text" value="{{ request.form.word or '' }}">
+        </div>
+        <div class="field">
+            <label for="textInput">説明:</label>
+            <textarea id="textInput" name="text" rows="5" cols="50">{{ request.form.text }}</textarea>
+        </div>
+        <button type="submit">追加</button>
+        <button type="button" onclick="clearText()">クリア</button>
+    </form>
+    <hr>
+    <form method="GET" action="/" style="margin-bottom:12px;">
+        <input name="q" placeholder="用語で検索" value="{{ q or request.args.get('q','') }}">
+        <input name="q_text" placeholder="説明で検索" value="{{ q_text or request.args.get('q_text','') }}">
+        <button type="submit">検索</button>
+        <a href="/">クリア</a>
+    </form>
+
+    <!-- <h2>一覧</h2>
+    <form method="POST" action="/delete" onsubmit="return confirm('本当に履歴を削除しますか？');">
+        <button type="submit">履歴をすべて削除</button>
+    </form> -->
+    <table border="1">
+        <tr>
+            <th>用語</th>
+            <th>説明</th>
+            <th></th>
+        </tr>
+        {% for row in history %}
+        <tr>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>
+                <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
+                <form method="POST" action="/delete/{{ row[0] }}" style="display:inline" onsubmit="return confirm('この履歴を削除しますか？');">
+                    <button type="submit" class="btn btn--delete">削除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+    function clearText() {
+        document.getElementById("textInput").value = "";
+    }
+    </script>
+
+</body>
+</html>

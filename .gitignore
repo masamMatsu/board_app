@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+.venv/
+ENV/
+env/
+
+# SQLite DB
+*.db
+
+# Flask
+instance/
+*.pyc
+
+# Test / coverage
+.pytest_cache/
+coverage.xml
+
+# Editor
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log

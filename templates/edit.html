@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>編集</title>
+    <style>
+        .field { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .field label { margin-bottom: 6px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>投稿を編集</h1>
+    <form method="POST">
+        <div class="field">
+            <label for="wordInput">用語:</label>
+            <input id="wordInput" name="word" type="text" value="{{ row[3] or '' }}">
+        </div>
+        <div class="field">
+            <label for="textInput">説明:</label>
+            <textarea id="textInput" name="text" rows="5" cols="50">{{ row[2] or '' }}</textarea>
+        </div>
+        <button type="submit">更新する</button>
+        <a href="/">キャンセル</a>
+    </form>
+</body>
+</html>
