@@ -27,3 +27,4 @@ coverage.xml
 
 # Logs
 *.log
+static/uploads/

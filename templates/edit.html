@@ -4,23 +4,37 @@
     <meta charset="UTF-8">
     <title>編集</title>
     <style>
-        .field { display: flex; flex-direction: column; margin-bottom: 8px; }
-        .field label { margin-bottom: 6px; font-weight: bold; }
+        body { font-family: "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; background:#f7f9fc; color:#222; }
+        .container { max-width:720px; margin:24px auto; background:#fff; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-radius:6px; }
+        .field { display:flex; flex-direction:column; margin-bottom:12px; }
+        .field label { margin-bottom:6px; font-weight:600; }
+        input[type="text"], textarea { border:1px solid #d0d7de; padding:8px 10px; border-radius:4px; font-size:14px; }
+        .btn-primary { background:#0069d9; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+        .btn-secondary { background:#6c757d; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
     </style>
 </head>
 <body>
-    <h1>投稿を編集</h1>
-    <form method="POST">
-        <div class="field">
-            <label for="wordInput">用語:</label>
-            <input id="wordInput" name="word" type="text" value="{{ row[3] or '' }}">
-        </div>
-        <div class="field">
-            <label for="textInput">説明:</label>
-            <textarea id="textInput" name="text" rows="5" cols="50">{{ row[2] or '' }}</textarea>
-        </div>
-        <button type="submit">更新する</button>
-        <a href="/">キャンセル</a>
-    </form>
+    <div class="container">
+        <h1 style="margin-top:0;">投稿を編集</h1>
+        <form method="POST">
+            <div class="field">
+                <label for="wordInput">用語</label>
+                <input id="wordInput" name="word" type="text" value="{{ row[3] or '' }}">
+            </div>
+            <div class="field">
+                <label for="textInput">説明</label>
+                <textarea id="textInput" name="text" rows="5">{{ row[2] or '' }}</textarea>
+            </div>
+            <div class="field">
+                <label for="imageInput">画像（任意）</label>
+                {% if row[4] %}
+                    <div style="margin-bottom:8px;"><img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:200px; max-height:150px; object-fit:cover; border-radius:4px;"></div>
+                {% endif %}
+                <input id="imageInput" name="image" type="file" accept="image/*">
+            </div>
+            <button type="submit" class="btn-primary">更新する</button>
+            <a href="/" class="btn-secondary" style="display:inline-block; margin-left:8px; text-decoration:none;">キャンセル</a>
+        </form>
+    </div>
 </body>
 </html>

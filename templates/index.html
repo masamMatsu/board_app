@@ -4,26 +4,28 @@
     <meta charset="UTF-8">
     <title>IT用語掲示板</title>
     <style>
-        .field { display: flex; flex-direction: column; margin-bottom: 8px; }
-        .field label { margin-bottom: 6px; font-weight: bold; }
-        .btn {
-            display: inline-block;
-            padding: 6px 10px;
-            margin-right: 6px;
-            font-size: 14px;
-            color: #fff;
-            text-decoration: none;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn--edit { background: #1976d2; }
-        .btn--delete { background: #d32f2f; }
+        body { font-family: "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; background:#f7f9fc; color:#222; }
+        .container { max-width: 900px; margin:24px auto; background:#fff; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-radius:6px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 12px; }
+        .field label { margin-bottom: 6px; font-weight: 600; color:#333; }
+        input[type="text"], textarea { border:1px solid #d0d7de; padding:8px 10px; border-radius:4px; font-size:14px; }
+        button, .btn { display:inline-block; padding:8px 12px; margin-right:8px; font-size:14px; border-radius:6px; border: none; cursor:pointer; }
+        button[type="submit"] { background:#0069d9; color:#fff; }
+        button[type="button"] { background:#6c757d; color:#fff; }
+        .btn--edit { background:#0d6efd; color:#fff; padding:6px 10px; border-radius:4px; text-decoration:none; }
+        .btn--delete { background:#dc3545; color:#fff; padding:6px 10px; border-radius:4px; }
+        table { width:100%; border-collapse:collapse; margin-top:12px; }
+        table th, table td { padding:10px 8px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+        table th { text-align:left; background:#fafbfd; color:#333; font-weight:600; }
+        .search-row { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+        form.post-form { margin-bottom: 20px; }
+        @media (max-width:600px){ .container{margin:8px;} .search-row{flex-direction:column; align-items:stretch;} }
     </style>
 </head>
 <body>
-    <h1>IT用語掲示板</h1>
-    <form method="POST">
+    <div class="container">
+        <h1 style="margin-top:0;">IT用語掲示板</h1>
+        <form method="POST" class="post-form">
         <div class="field">
             <label for="wordInput">用語:</label>
             <input id="wordInput" name="word" type="text" value="{{ request.form.word or '' }}">
@@ -32,16 +34,22 @@
             <label for="textInput">説明:</label>
             <textarea id="textInput" name="text" rows="5" cols="50">{{ request.form.text }}</textarea>
         </div>
-        <button type="submit">追加</button>
-        <button type="button" onclick="clearText()">クリア</button>
-    </form>
-    <hr>
-    <form method="GET" action="/" style="margin-bottom:12px;">
-        <input name="q" placeholder="用語で検索" value="{{ q or request.args.get('q','') }}">
-        <input name="q_text" placeholder="説明で検索" value="{{ q_text or request.args.get('q_text','') }}">
-        <button type="submit">検索</button>
-        <a href="/">クリア</a>
-    </form>
+                <div class="field">
+                    <label for="imageInput">画像（任意）</label>
+                    <input id="imageInput" name="image" type="file" accept="image/*">
+                </div>
+            <button type="submit">追加</button>
+            <button type="button" onclick="clearText()">クリア</button>
+        </form>
+
+        <div class="search-row">
+            <form method="GET" action="/" style="display:flex; gap:8px; width:100%;">
+                <input name="q" placeholder="用語で検索" value="{{ q or request.args.get('q','') }}" style="max-width:220px;">
+                <input name="q_text" placeholder="説明で検索" value="{{ q_text or request.args.get('q_text','') }}" style="flex:1;">
+                <button type="submit">検索</button>
+                <a href="/" class="btn--edit" style="background:#6c757d; color:#fff; padding:8px 12px; border-radius:6px; text-decoration:none;">クリア</a>
+            </form>
+        </div>
 
     <!-- <h2>一覧</h2>
     <form method="POST" action="/delete" onsubmit="return confirm('本当に履歴を削除しますか？');">
@@ -55,14 +63,19 @@
         </tr>
         {% for row in history %}
         <tr>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>
-                <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
-                <form method="POST" action="/delete/{{ row[0] }}" style="display:inline" onsubmit="return confirm('この履歴を削除しますか？');">
-                    <button type="submit" class="btn btn--delete">削除</button>
-                </form>
-            </td>
+                <td>
+                    {% if row[4] %}
+                        <div style="margin-bottom:6px;"><img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:120px; max-height:80px; display:block; object-fit:cover; border-radius:4px;"></div>
+                    {% endif %}
+                    {{ row[3] }}
+                </td>
+                <td>{{ row[2] }}</td>
+                <td>
+                    <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
+                    <form method="POST" action="/delete/{{ row[0] }}" style="display:inline" onsubmit="return confirm('この履歴を削除しますか？');">
+                        <button type="submit" class="btn btn--delete">削除</button>
+                    </form>
+                </td>
         </tr>
         {% endfor %}
     </table>
