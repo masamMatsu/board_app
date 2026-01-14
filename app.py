@@ -86,7 +86,23 @@ def edit_entry(entry_id):
     if request.method == 'POST':
         text = request.form.get('text')
         word = request.form.get('word')
-        db.update(entry_id, text, word)
+        # handle uploaded image for edit
+        image_file = request.files.get('image')
+        image_filename = None
+        if image_file and image_file.filename:
+            fn = secure_filename(image_file.filename)
+            ext = fn.rsplit('.', 1)[-1].lower() if '.' in fn else ''
+            if ext in ALLOWED_EXT:
+                base, _ = os.path.splitext(fn)
+                counter = 0
+                candidate = fn
+                while os.path.exists(os.path.join(UPLOAD_DIR, candidate)):
+                    counter += 1
+                    candidate = f"{base}_{counter}.{ext}"
+                image_file.save(os.path.join(UPLOAD_DIR, candidate))
+                image_filename = candidate
+        # pass image_filename (None leaves existing image unchanged)
+        db.update(entry_id, text, word, image_filename)
         return redirect(url_for('index'))
     # GET
     row = db.fetch_by_id(entry_id)

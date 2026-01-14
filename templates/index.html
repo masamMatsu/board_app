@@ -25,7 +25,7 @@
 <body>
     <div class="container">
         <h1 style="margin-top:0;">IT用語掲示板</h1>
-        <form method="POST" class="post-form">
+        <form method="POST" enctype="multipart/form-data" class="post-form">
         <div class="field">
             <label for="wordInput">用語:</label>
             <input id="wordInput" name="word" type="text" value="{{ request.form.word or '' }}">
