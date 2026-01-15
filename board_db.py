@@ -36,7 +36,7 @@ class BoardDB:
         c.execute("""
             INSERT INTO history (created_at, text, word, image)
             VALUES (?, ?, ?, ?)
-        "", (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), text, word, image))
+        """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), text, word, image))
         conn.commit()
         conn.close()
 

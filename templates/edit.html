@@ -3,15 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>編集</title>
-    <style>
-        body { font-family: "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; background:#f7f9fc; color:#222; }
-        .container { max-width:720px; margin:24px auto; background:#fff; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-radius:6px; }
-        .field { display:flex; flex-direction:column; margin-bottom:12px; }
-        .field label { margin-bottom:6px; font-weight:600; }
-        input[type="text"], textarea { border:1px solid #d0d7de; padding:8px 10px; border-radius:4px; font-size:14px; }
-        .btn-primary { background:#0069d9; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
-        .btn-secondary { background:#6c757d; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -19,8 +11,11 @@
         <form method="POST" enctype="multipart/form-data">
             <div class="field">
                 <label for="wordInput">用語</label>
-                <input id="wordInput" name="word" type="text" value="{{ row[3] or '' }}">
+                <input id="wordInput" name="word" type="text" value="{{ row[3] or '' }}" required>
             </div>
+            {% if error %}
+                <div style="color:#b00020; margin-top:8px; font-weight:600;">{{ error }}</div>
+            {% endif %}
             <div class="field">
                 <label for="textInput">説明</label>
                 <textarea id="textInput" name="text" rows="5">{{ row[2] or '' }}</textarea>

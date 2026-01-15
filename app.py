@@ -19,8 +19,8 @@ def index():
         word = request.form.get("word")
         # handle uploaded image
         image_file = request.files.get('image')
-        image_filename = None
-        if image_file and image_file.filename:
+        image_filename = None   #変更後のファイル名
+        if image_file and image_file.filename:  #変更前のファイル名
             fn = secure_filename(image_file.filename)
             ext = fn.rsplit('.', 1)[-1].lower() if '.' in fn else ''
             if ext in ALLOWED_EXT:
@@ -33,12 +33,22 @@ def index():
                     candidate = f"{base}_{counter}.{ext}"
                 image_file.save(os.path.join(UPLOAD_DIR, candidate))
                 image_filename = candidate
-        result = {
-            "text": text,
-            "word": word
-        }
+        # validate required 'word'
+        if not word or not word.strip():
+            result = {"text": text, "word": word, "error": '用語は必須です'}
+            # render current history without redirect
+            history = db.fetch_all(None, None)
+            display_history = []
+            for row in history:
+                hid = row[0]
+                hcreated = row[1]
+                htext = _highlight(row[2], None) if None else escape(row[2] or '')
+                hword = _highlight(row[3], None) if None else escape(row[3] or '')
+                himage = row[4] if len(row) > 4 else None
+                display_history.append((hid, hcreated, htext, hword, himage))
+            return render_template("index.html", result=result, history=display_history, q=None, q_text=None)
+        # save and redirect on success
         db.save(text, word, image_filename)
-        # POST/Redirect/GET: 投稿後はリダイレクトしてフォームをクリアする
         return redirect(url_for('index'))
     # 検索クエリ（GET パラメータ）を受け取る
     q = request.args.get('q')
@@ -72,11 +82,30 @@ def index():
 
 @app.route("/delete", methods=["POST"])
 def delete_all():
+    # delete image files for all entries, then clear DB
+    rows = db.fetch_all()
+    for r in rows:
+        if len(r) > 4 and r[4]:
+            try:
+                fp = os.path.join(UPLOAD_DIR, r[4])
+                if os.path.exists(fp):
+                    os.remove(fp)
+            except Exception:
+                pass
     db.delete_all()
     return redirect(url_for("index"))
 
 @app.route("/delete/<int:entry_id>", methods=["POST"])
 def delete_entry(entry_id):
+    # remove associated image file if exists
+    row = db.fetch_by_id(entry_id)
+    if row and len(row) > 4 and row[4]:
+        try:
+            fp = os.path.join(UPLOAD_DIR, row[4])
+            if os.path.exists(fp):
+                os.remove(fp)
+        except Exception:
+            pass
     db.delete_by_id(entry_id)
     return redirect(url_for("index"))
 
@@ -101,6 +130,10 @@ def edit_entry(entry_id):
                     candidate = f"{base}_{counter}.{ext}"
                 image_file.save(os.path.join(UPLOAD_DIR, candidate))
                 image_filename = candidate
+        # validate required 'word' for edit
+        if not word or not word.strip():
+            row = db.fetch_by_id(entry_id)
+            return render_template('edit.html', row=row, error='用語は必須です')
         # pass image_filename (None leaves existing image unchanged)
         db.update(entry_id, text, word, image_filename)
         return redirect(url_for('index'))

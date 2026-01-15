@@ -3,24 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>IT用語掲示板</title>
-    <style>
-        body { font-family: "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; background:#f7f9fc; color:#222; }
-        .container { max-width: 900px; margin:24px auto; background:#fff; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-radius:6px; }
-        .field { display: flex; flex-direction: column; margin-bottom: 12px; }
-        .field label { margin-bottom: 6px; font-weight: 600; color:#333; }
-        input[type="text"], textarea { border:1px solid #d0d7de; padding:8px 10px; border-radius:4px; font-size:14px; }
-        button, .btn { display:inline-block; padding:8px 12px; margin-right:8px; font-size:14px; border-radius:6px; border: none; cursor:pointer; }
-        button[type="submit"] { background:#0069d9; color:#fff; }
-        button[type="button"] { background:#6c757d; color:#fff; }
-        .btn--edit { background:#0d6efd; color:#fff; padding:6px 10px; border-radius:4px; text-decoration:none; }
-        .btn--delete { background:#dc3545; color:#fff; padding:6px 10px; border-radius:4px; }
-        table { width:100%; border-collapse:collapse; margin-top:12px; }
-        table th, table td { padding:10px 8px; border-bottom:1px solid #e9ecef; vertical-align:top; }
-        table th { text-align:left; background:#fafbfd; color:#333; font-weight:600; }
-        .search-row { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
-        form.post-form { margin-bottom: 20px; }
-        @media (max-width:600px){ .container{margin:8px;} .search-row{flex-direction:column; align-items:stretch;} }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -28,7 +11,7 @@
         <form method="POST" enctype="multipart/form-data" class="post-form">
         <div class="field">
             <label for="wordInput">用語:</label>
-            <input id="wordInput" name="word" type="text" value="{{ request.form.word or '' }}">
+            <input id="wordInput" name="word" type="text" value="{{ request.form.word or '' }}" required>
         </div>
         <div class="field">
             <label for="textInput">説明:</label>
@@ -41,6 +24,9 @@
             <button type="submit">追加</button>
             <button type="button" onclick="clearText()">クリア</button>
         </form>
+        {% if result and result.error %}
+            <div style="color:#b00020; margin-top:8px; font-weight:600;">{{ result.error }}</div>
+        {% endif %}
 
         <div class="search-row">
             <form method="GET" action="/" style="display:flex; gap:8px; width:100%;">
@@ -63,12 +49,18 @@
         </tr>
         {% for row in history %}
         <tr>
-                <td>
-                    {% if row[4] %}
-                        <div style="margin-bottom:6px;"><img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:120px; max-height:80px; display:block; object-fit:cover; border-radius:4px;"></div>
-                    {% endif %}
-                    {{ row[3] }}
-                </td>
+                    <tr>
+                        {% if row[4] %}
+                            <td>
+                                <a href="#" onclick="showImage('{{ url_for('static', filename='uploads/' + row[4]) }}'); return false;">
+                                    <img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:120px; max-height:80px; display:block; object-fit:cover; border-radius:4px;">
+                                </a>
+                                <div style="margin-top:6px;">{{ row[3] }}</div>
+                            </td>
+                        {% else %}
+                            <td>{{ row[3] }}</td>
+                        {% endif %}
+                    
                 <td>{{ row[2] }}</td>
                 <td>
                     <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
@@ -79,9 +71,32 @@
         </tr>
         {% endfor %}
     </table>
+    <!-- Image modal -->
+    <div id="imgModal" style="display:none; position:fixed; z-index:1200; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.85);">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+            <div style="position:relative; max-width:94vw; max-height:94vh;">
+                <button id="imgModalClose" onclick="hideImage()" style="position:absolute; right:-12px; top:-12px; background:#fff; border-radius:50%; border:none; width:36px; height:36px; cursor:pointer; font-weight:700;">✕</button>
+                <img id="imgModalImg" src="" alt="" style="display:block; max-width:94vw; max-height:94vh; object-fit:contain; border-radius:6px;">
+            </div>
+        </div>
+    </div>
     <script>
     function clearText() {
         document.getElementById("textInput").value = "";
+    }
+    function showImage(src){
+        var modal = document.getElementById('imgModal');
+        var img = document.getElementById('imgModalImg');
+        img.src = src;
+        modal.style.display = 'flex';
+        // allow click outside image to close
+        modal.onclick = function(e){ if(e.target===modal) hideImage(); };
+    }
+    function hideImage(){
+        var modal = document.getElementById('imgModal');
+        var img = document.getElementById('imgModalImg');
+        img.src = '';
+        modal.style.display = 'none';
     }
     </script>
 
