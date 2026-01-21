@@ -52,10 +52,10 @@
                     <tr>
                         {% if row[4] %}
                             <td>
+                                <div style="margin-top:6px;">{{ row[3] }}</div>
                                 <a href="#" onclick="showImage('{{ url_for('static', filename='uploads/' + row[4]) }}'); return false;">
                                     <img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:120px; max-height:80px; display:block; object-fit:cover; border-radius:4px;">
                                 </a>
-                                <div style="margin-top:6px;">{{ row[3] }}</div>
                             </td>
                         {% else %}
                             <td>{{ row[3] }}</td>
