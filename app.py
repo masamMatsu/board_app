@@ -17,6 +17,7 @@ def index():
     if request.method == "POST":
         text = request.form.get("text")
         word = request.form.get("word")
+        url = request.form.get("url")
         # handle uploaded image
         image_file = request.files.get('image')
         image_filename = None   #変更後のファイル名
@@ -45,10 +46,11 @@ def index():
                 htext = _highlight(row[2], None) if None else escape(row[2] or '')
                 hword = _highlight(row[3], None) if None else escape(row[3] or '')
                 himage = row[4] if len(row) > 4 else None
-                display_history.append((hid, hcreated, htext, hword, himage))
+                hurl = row[5] if len(row) > 5 else None
+                display_history.append((hid, hcreated, htext, hword, himage, hurl))
             return render_template("index.html", result=result, history=display_history, q=None, q_text=None)
         # save and redirect on success
-        db.save(text, word, image_filename)
+        db.save(text, word, image_filename, url)
         return redirect(url_for('index'))
     # 検索クエリ（GET パラメータ）を受け取る
     q = request.args.get('q')
@@ -70,13 +72,14 @@ def index():
 
     display_history = []
     for row in history:
-        # row: (id, created_at, text, word)
+        # row: (id, created_at, text, word, image, url)
         hid = row[0]
         hcreated = row[1]
         htext = _highlight(row[2], q_text) if q_text else escape(row[2] or '')
         hword = _highlight(row[3], q) if q else escape(row[3] or '')
         himage = row[4] if len(row) > 4 else None
-        display_history.append((hid, hcreated, htext, hword, himage))
+        hurl = row[5] if len(row) > 5 else None
+        display_history.append((hid, hcreated, htext, hword, himage, hurl))
 
     return render_template("index.html", result=result, history=display_history, q=q, q_text=q_text)
 
@@ -115,6 +118,7 @@ def edit_entry(entry_id):
     if request.method == 'POST':
         text = request.form.get('text')
         word = request.form.get('word')
+        url = request.form.get('url')
         # handle uploaded image for edit
         image_file = request.files.get('image')
         image_filename = None
@@ -135,7 +139,7 @@ def edit_entry(entry_id):
             row = db.fetch_by_id(entry_id)
             return render_template('edit.html', row=row, error='用語は必須です')
         # pass image_filename (None leaves existing image unchanged)
-        db.update(entry_id, text, word, image_filename)
+        db.update(entry_id, text, word, image_filename, url)
         return redirect(url_for('index'))
     # GET
     row = db.fetch_by_id(entry_id)

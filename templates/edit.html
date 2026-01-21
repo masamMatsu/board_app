@@ -21,6 +21,10 @@
                 <textarea id="textInput" name="text" rows="5">{{ row[2] or '' }}</textarea>
             </div>
             <div class="field">
+                <label for="urlInput">関連URL（任意）</label>
+                <input id="urlInput" name="url" type="url" value="{{ row[5] or '' }}">
+            </div>
+            <div class="field">
                 <label for="imageInput">画像（任意）</label>
                 {% if row[4] %}
                     <div style="margin-bottom:8px;"><img src="{{ url_for('static', filename='uploads/' + row[4]) }}" alt="" style="max-width:200px; max-height:150px; object-fit:cover; border-radius:4px;"></div>

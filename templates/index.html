@@ -17,6 +17,10 @@
             <label for="textInput">説明:</label>
             <textarea id="textInput" name="text" rows="5" cols="50">{{ request.form.text }}</textarea>
         </div>
+        <div class="field">
+            <label for="urlInput">関連URL（任意）</label>
+            <input id="urlInput" name="url" type="url" value="{{ request.form.url or '' }}">
+        </div>
                 <div class="field">
                     <label for="imageInput">画像（任意）</label>
                     <input id="imageInput" name="image" type="file" accept="image/*">
@@ -45,6 +49,7 @@
         <tr>
             <th>用語</th>
             <th>説明</th>
+            <th>関連URL</th>
             <th></th>
         </tr>
         {% for row in history %}
@@ -62,6 +67,13 @@
                         {% endif %}
                     
                 <td>{{ row[2] }}</td>
+                <td>
+                    {% if row[5] %}
+                        <a href="{{ row[5] }}" target="_blank" style="color:#0066cc; text-decoration:none;">📎 リンク</a>
+                    {% else %}
+                        <span style="color:#999;">-</span>
+                    {% endif %}
+                </td>
                 <td>
                     <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
                     <form method="POST" action="/delete/{{ row[0] }}" style="display:inline" onsubmit="return confirm('この履歴を削除しますか？');">

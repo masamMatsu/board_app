@@ -25,25 +25,29 @@ class BoardDB:
         if 'image' not in cols:
             c.execute("ALTER TABLE history ADD COLUMN image TEXT")
             conn.commit()
+        # カラム 'url' が無ければ追加する（関連URLを保持）
+        if 'url' not in cols:
+            c.execute("ALTER TABLE history ADD COLUMN url TEXT")
+            conn.commit()
         conn.close()
 
     def _connect(self):
         return sqlite3.connect(self.db_path)
 
-    def save(self, text, word=None, image=None):
+    def save(self, text, word=None, image=None, url=None):
         conn = self._connect()
         c = conn.cursor()
         c.execute("""
-            INSERT INTO history (created_at, text, word, image)
-            VALUES (?, ?, ?, ?)
-        """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), text, word, image))
+            INSERT INTO history (created_at, text, word, image, url)
+            VALUES (?, ?, ?, ?, ?)
+        """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), text, word, image, url))
         conn.commit()
         conn.close()
 
     def fetch_all(self, q=None, q_text=None):
         conn = self._connect()
         c = conn.cursor()
-        sql = "SELECT id, created_at, text, word, image FROM history"
+        sql = "SELECT id, created_at, text, word, image, url FROM history"
         conds = []
         params = []
         if q:
@@ -77,18 +81,18 @@ class BoardDB:
     def fetch_by_id(self, entry_id):
         conn = self._connect()
         c = conn.cursor()
-        c.execute("SELECT id, created_at, text, word, image FROM history WHERE id = ?", (entry_id,))
+        c.execute("SELECT id, created_at, text, word, image, url FROM history WHERE id = ?", (entry_id,))
         row = c.fetchone()
         conn.close()
         return row
 
-    def update(self, entry_id, text, word=None, image=None):
+    def update(self, entry_id, text, word=None, image=None, url=None):
         conn = self._connect()
         c = conn.cursor()
         # update image only if provided (allow clearing with empty string)
         if image is not None:
-            c.execute("UPDATE history SET text = ?, word = ?, image = ? WHERE id = ?", (text, word, image, entry_id))
+            c.execute("UPDATE history SET text = ?, word = ?, image = ?, url = ? WHERE id = ?", (text, word, image, url, entry_id))
         else:
-            c.execute("UPDATE history SET text = ?, word = ? WHERE id = ?", (text, word, entry_id))
+            c.execute("UPDATE history SET text = ?, word = ?, url = ? WHERE id = ?", (text, word, url, entry_id))
         conn.commit()
         conn.close()
