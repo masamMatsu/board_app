@@ -49,8 +49,8 @@
         <tr>
             <th>用語</th>
             <th>説明</th>
-            <th>関連URL</th>
-            <th></th>
+            <th>URL</th>
+            <th>編集</th>
         </tr>
         {% for row in history %}
         <tr>
@@ -69,15 +69,15 @@
                 <td>{{ row[2] }}</td>
                 <td>
                     {% if row[5] %}
-                        <a href="{{ row[5] }}" target="_blank" style="color:#0066cc; text-decoration:none;">📎 リンク</a>
+                        <a href="{{ row[5] }}" target="_blank" style="color:#0066cc; text-decoration:none; font-size:1.2em;" title="{{ row[5] }}">🔗</a>
                     {% else %}
-                        <span style="color:#999;">-</span>
+                        <span style="color:#999;"></span>
                     {% endif %}
                 </td>
                 <td>
-                    <a class="btn btn--edit" href="/edit/{{ row[0] }}">編集</a>
+                    <a href="/edit/{{ row[0] }}" style="text-decoration:none; font-size:1.2em; margin-right:8px;" title="編集">✏️</a>
                     <form method="POST" action="/delete/{{ row[0] }}" style="display:inline" onsubmit="return confirm('この履歴を削除しますか？');">
-                        <button type="submit" class="btn btn--delete">削除</button>
+                        <button type="submit" style="background:none; border:none; cursor:pointer; font-size:1.2em; padding:0;" title="削除">🗑️</button>
                     </form>
                 </td>
         </tr>
