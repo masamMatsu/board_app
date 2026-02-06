@@ -44,22 +44,16 @@ class BoardDB:
         conn.commit()
         conn.close()
 
-    def fetch_all(self, q=None, q_text=None):
+    def fetch_all(self, q=None):
         conn = self._connect()
         c = conn.cursor()
         sql = "SELECT id, created_at, text, word, image, url FROM history"
-        conds = []
-        params = []
         if q:
-            conds.append("word LIKE ?")
-            params.append('%' + q + '%')
-        if q_text:
-            conds.append("text LIKE ?")
-            params.append('%' + q_text + '%')
-        if conds:
-            sql += " WHERE " + " AND ".join(conds)
-        sql += " ORDER BY id DESC"
-        c.execute(sql, params)
+            # キーワードで用語と説明の両方を検索
+            sql += " WHERE word LIKE ? OR text LIKE ?"
+            c.execute(sql + " ORDER BY id DESC", ('%' + q + '%', '%' + q + '%'))
+        else:
+            c.execute(sql + " ORDER BY id DESC")
         rows = c.fetchall()
         conn.close()
         return rows

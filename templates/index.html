@@ -34,8 +34,7 @@
 
         <div class="search-row">
             <form method="GET" action="/" style="display:flex; gap:8px; width:100%;">
-                <input name="q" placeholder="用語で検索" value="{{ q or request.args.get('q','') }}" style="max-width:220px;">
-                <input name="q_text" placeholder="説明で検索" value="{{ q_text or request.args.get('q_text','') }}" style="flex:1;">
+                <input name="q" placeholder="用語または説明で検索" value="{{ q or request.args.get('q','') }}" style="flex:1;">
                 <button type="submit">検索</button>
                 <a href="/" class="btn--edit" style="background:#6c757d; color:#fff; padding:8px 12px; border-radius:6px; text-decoration:none;">クリア</a>
             </form>

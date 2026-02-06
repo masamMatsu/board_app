@@ -52,10 +52,10 @@ def index():
         # save and redirect on success
         db.save(text, word, image_filename, url)
         return redirect(url_for('index'))
-    # 検索クエリ（GET パラメータ）を受け取る
+    # 統合検索クエリ（GET パラメータ）を受け取る
+    # 1つのキーワードで用語と説明の両方を検索
     q = request.args.get('q')
-    q_text = request.args.get('q_text')
-    history = db.fetch_all(q, q_text)
+    history = db.fetch_all(q)
 
     def _highlight(s, term):
         if not term or not s:
@@ -75,13 +75,13 @@ def index():
         # row: (id, created_at, text, word, image, url)
         hid = row[0]
         hcreated = row[1]
-        htext = _highlight(row[2], q_text) if q_text else escape(row[2] or '')
+        htext = _highlight(row[2], q) if q else escape(row[2] or '')
         hword = _highlight(row[3], q) if q else escape(row[3] or '')
         himage = row[4] if len(row) > 4 else None
         hurl = row[5] if len(row) > 5 else None
         display_history.append((hid, hcreated, htext, hword, himage, hurl))
 
-    return render_template("index.html", result=result, history=display_history, q=q, q_text=q_text)
+    return render_template("index.html", result=result, history=display_history, q=q)
 
 @app.route("/delete", methods=["POST"])
 def delete_all():
